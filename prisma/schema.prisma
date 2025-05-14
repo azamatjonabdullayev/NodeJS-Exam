@@ -1,0 +1,233 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+/*
+! ENUMs
+*/
+enum Roles {
+  ADMIN
+  USER
+  SUPERADMIN
+}
+
+enum PlanTier {
+  BASIC
+  STANDARD
+  PREMIUM
+  PREMIUM_PLUS
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  PENDING
+}
+
+
+
+enum PaymentMethod {
+  CASH
+  CARD
+  BANK_TRANSFER
+  PAYPAL
+  CRYPTO
+}
+
+enum VideoQuality {
+  p240 @map("240p")
+  p360 @map("360p")
+  p480 @map("480p")
+  p720 @map("720p")
+  p1080 @map("1080p")
+  p4K @map("4k")
+  p8K @map("8k")
+}
+
+enum VideoLanguage {
+  en
+  ru
+  uz
+}
+
+
+
+
+/*
+! USERS
+*/
+model User {
+  id String @id @default(uuid()) @db.Uuid
+  username String @unique @db.VarChar(100)
+  avatarImage String? @map("avatar_image")
+  email String @unique @db.VarChar(255)
+  password String @db.VarChar(150)
+  role Roles? @default(USER)
+
+  createdAt DateTime @default(now()) @db.Timestamp()  @map("created_at")
+  updatedAt DateTime @default(now()) @db.Timestamp()  @map("updated_at")
+
+  subscriptions UserSubscription[]
+  movies Movie[]
+  favourites Favourite[]
+  reviews Review[]
+
+
+  @@map("users")
+}
+
+
+
+/*
+! SUBSCRIPTION PLANS
+*/
+model SubscriptionPlans {
+  id String @id @default(uuid()) @db.Uuid
+  name String @db.VarChar(255) @map("subscription_name")
+  tier PlanTier? @default(BASIC)
+  description String @db.Text
+  price Float
+  duration_days Int @db.Integer
+  is_active Boolean? @default(true)
+  
+  createdAt DateTime @default(now()) @db.Timestamp()  @map("created_at")
+  updatedAt DateTime @default(now()) @db.Timestamp()  @map("updated_at")
+
+  userSubscriptions UserSubscription[]
+
+  @@map("subscription_plans")
+}
+
+
+/*
+! USER SUBSCRIPTIONS
+*/
+model UserSubscription {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid @map("user_id")
+  subscriptionId String @db.Uuid @map("subscription_id")
+  startDate DateTime @default(now()) @db.Timestamp() @map("start_date") 
+  endDate DateTime @db.Timestamp() @map("end_date")
+  status SubscriptionStatus? @default(PENDING)
+
+  createdAt DateTime @default(now()) @db.Timestamp()  @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+  subscription SubscriptionPlans @relation(fields: [subscriptionId], references: [id])
+  payment Payment[]
+
+  @@map("user_subscriptions")
+}
+
+
+
+/*
+! PAYMENTS
+*/
+model Payment {
+  id String @id @default(uuid()) @db.Uuid
+  userSubscriptionId String @db.Uuid @map("user_subscription_id")
+  amount Float
+  paymentMethod PaymentMethod? @default(CASH)
+  externalTransactionId String? @db.VarChar(50) @map("external_transaction_id")
+  
+  paymentDate DateTime @default(now()) @db.Timestamp() @map("payment_date") 
+
+  userSubscription UserSubscription @relation(fields: [userSubscriptionId], references: [id])
+
+  @@map("payments")
+}
+
+
+/*
+! CATEGORIES
+*/
+model Category {
+  id String @id @default(uuid()) @db.Uuid
+  name String @db.VarChar(255)
+  description String? @db.Text
+
+  movies Movie[]
+
+  @@map("categories")
+}
+
+
+
+/*
+! MOVIES
+*/
+model Movie {
+  id String @id @default(uuid()) @db.Uuid
+  title String @db.VarChar(255)
+  description String? @db.Text
+  categoryId String @db.Uuid @map("category_id")
+  releaseYear Int @map("release_year")
+  duration Int
+  poster_url String @db.VarChar(500)
+  rating Float
+  subscriptionType PlanTier? @default(BASIC) @map("subscription_tier")
+  view_count Int @default(0) @map("views")
+  uploaded_by String @db.Uuid
+
+  users User @relation(fields: [uploaded_by], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  created_at DateTime @default(now()) @db.Timestamp()
+  updated_at DateTime @default(now()) @db.Timestamp()
+
+  movie_files MovieFiles[]
+  favourites Favourite[]
+  reviews Review[]
+
+  @@map("movies")
+}
+
+
+model MovieFiles {
+  id String @id @default(uuid()) @db.Uuid
+  movieId String @db.Uuid @map("movie_id")
+  video_url String @db.VarChar(300)
+  quality VideoQuality? @default(p4K)
+  language VideoLanguage? @default(uz)
+
+  movies Movie @relation(fields: [movieId], references: [id])
+
+  @@map("movie_files")
+}
+
+model Favourite {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid @map("user_id")
+  movieId String @db.Uuid @map("movie_id")
+
+  user User @relation(fields: [userId], references: [id])
+  movie Movie @relation(fields: [movieId], references: [id])
+
+  @@unique([userId, movieId])
+
+  @@map("favourites")
+}
+
+model Review {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid @map("user_id")
+  movieId String @db.Uuid @map("movie_id")
+  rating Int
+  comment String? @db.Text
+
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @db.Timestamp()
+
+  @@unique([userId, movieId])
+
+  user User @relation(fields: [userId], references: [id])
+  movie Movie @relation(fields: [movieId], references: [id])
+}
