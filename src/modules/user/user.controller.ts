@@ -31,7 +31,7 @@ export class UserController {
     return await this.userService.getUserById(id);
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard, ChekRolesGuard)
   @Post('new')
   @UseInterceptors(FileInterceptor('avatarImage'))
   async addNewUser(

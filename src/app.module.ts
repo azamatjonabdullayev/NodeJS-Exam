@@ -1,16 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CoreModule } from './core/core.module';
 import { UserModule } from './modules/user/user.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
-  imports: [
-    CoreModule,
-    UserModule,
-    ServeStaticModule.forRoot({
-      rootPath: 'uploads',
-      serveRoot: '/uploads',
-    }),
-  ],
+  imports: [CoreModule, UserModule, AuthModule],
 })
 export class AppModule {}

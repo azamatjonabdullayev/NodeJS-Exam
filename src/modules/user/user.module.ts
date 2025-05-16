@@ -12,7 +12,6 @@ import { extname } from 'node:path';
       storage: diskStorage({
         destination: './uploads/images',
         filename(req, file, callback) {
-          console.log('Saving file:', file.originalname);
           const ext: string = extname(file.originalname);
           const uuid: string = uuid4();
           callback(null, `${uuid}${ext}`);
@@ -32,5 +31,6 @@ import { extname } from 'node:path';
   ],
   controllers: [UserController],
   providers: [UserService],
+  exports: [UserService],
 })
 export class UserModule {}
