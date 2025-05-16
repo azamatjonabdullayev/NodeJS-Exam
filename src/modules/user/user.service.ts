@@ -12,6 +12,19 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async searchIdDev(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    return user;
+  }
+  //! Search by id for dev purposes ☝️☝️☝️
+
   async getAllUsers(): Promise<{ success: boolean; data: User[] }> {
     const users = await this.prisma.user.findMany();
     return {
@@ -33,6 +46,7 @@ export class UserService {
       success: true,
       data: {
         ...user,
+        password: null,
       },
     };
   }
@@ -67,13 +81,10 @@ export class UserService {
   }
 
   async updateUser(id: string, updatedData: Partial<CreateUserDto>) {
-    const user = await this.getUserById(id);
+    const user = await this.searchIdDev(id);
 
     if (updatedData.password) {
-      const cmp = await bcrypt.compare(
-        updatedData.password,
-        user.data.password,
-      );
+      const cmp = await bcrypt.compare(updatedData.password, user.password);
 
       if (!cmp) throw new ConflictException('Password is incorrect!');
 
@@ -94,7 +105,7 @@ export class UserService {
   }
 
   async deleteUser(id: string) {
-    await this.getUserById(id);
+    await this.searchIdDev(id);
 
     await this.prisma.user.delete({
       where: {
