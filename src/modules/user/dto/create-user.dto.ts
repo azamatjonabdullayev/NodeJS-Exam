@@ -28,6 +28,6 @@ export class CreateUserDto {
   avatarImage?: string;
 
   @IsOptional()
-  @IsEnum(Roles)
+  @IsEnum(Roles, { message: 'Invalid role' })
   role?: Roles;
 }

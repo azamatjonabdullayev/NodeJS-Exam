@@ -19,6 +19,7 @@ enum Roles {
 }
 
 enum PlanTier {
+  TRIAL
   BASIC
   STANDARD
   PREMIUM
@@ -69,7 +70,7 @@ model User {
   avatarImage String? @map("avatar_image")
   email String @unique @db.VarChar(255)
   password String @db.VarChar(150)
-  role Roles? @default(USER)
+  role Roles @default(USER)
 
   createdAt DateTime @default(now()) @db.Timestamp()  @map("created_at")
   updatedAt DateTime @default(now()) @db.Timestamp()  @map("updated_at")
