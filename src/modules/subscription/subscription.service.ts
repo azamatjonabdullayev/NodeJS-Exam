@@ -49,9 +49,9 @@ export class SubscriptionService {
     };
   }
 
-  async purchasePlan(data: PurchasePlanDto) {
+  async purchasePlan(userId: string, data: PurchasePlanDto) {
     const user = await this.prisma.user.findUnique({
-      where: { id: data.userId },
+      where: { id: userId },
     });
 
     if (!user) throw new NotFoundException('User not found');
@@ -67,7 +67,7 @@ export class SubscriptionService {
 
     const newPurchase = await this.prisma.userSubscription.create({
       data: {
-        userId: data.userId,
+        userId: userId,
         subscriptionId: data.planId,
         endDate,
       },

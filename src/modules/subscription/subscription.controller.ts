@@ -1,9 +1,10 @@
-import { Controller, Get, Body, UseGuards, Post } from '@nestjs/common';
+import { Controller, Get, Body, UseGuards, Post, Req } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { ChekRolesGuard } from 'src/common/guards/check-role.guard';
 import { CreateSubscriptionDto } from './dto/create-subs.dto';
 import { PurchasePlanDto } from './dto/purchase-plan.dto';
+import { Request } from 'express';
 
 @Controller('subscriptions')
 export class SubscriptionController {
@@ -29,7 +30,9 @@ export class SubscriptionController {
 
   @Post('purchase')
   @UseGuards(AuthGuard)
-  async purchasePlan(@Body() dto: PurchasePlanDto) {
-    return await this.subscriptionService.purchasePlan(dto);
+  async purchasePlan(@Req() req: Request, @Body() dto: PurchasePlanDto) {
+    const id = (req as any).user.id;
+
+    return await this.subscriptionService.purchasePlan(id, dto);
   }
 }

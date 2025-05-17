@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   MinLength,
 } from 'class-validator';
@@ -18,6 +19,7 @@ export class CreateSubscriptionDto {
   description: string;
 
   @IsEnum(PlanTier, { message: 'Invalid plan tier' })
+  @IsOptional()
   tier?: PlanTier;
 
   @IsNumber()
