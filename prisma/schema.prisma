@@ -156,8 +156,7 @@ model Movie {
   categoryId       String    @map("category_id") @db.Uuid
   releaseYear      Int       @map("release_year")
   duration         Int
-  poster_url       String    @db.VarChar(500)
-  rating           Float
+  poster_url       String?   @db.VarChar(500)
   subscriptionType PlanTier? @default(BASIC) @map("subscription_tier")
   view_count       Int       @default(0) @map("views")
   uploaded_by      String    @db.Uuid

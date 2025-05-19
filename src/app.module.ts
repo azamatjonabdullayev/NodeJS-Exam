@@ -8,6 +8,14 @@ import { CategoryModule } from './modules/category/category.module';
 import { MovieModule } from './modules/movie/movie.module';
 
 @Module({
-  imports: [CoreModule, UserModule, AuthModule, SubscriptionModule, PaymentModule, CategoryModule, MovieModule],
+  imports: [
+    CoreModule,
+    UserModule,
+    AuthModule,
+    SubscriptionModule,
+    PaymentModule,
+    CategoryModule,
+    MovieModule,
+  ],
 })
 export class AppModule {}
