@@ -7,6 +7,7 @@ import { PaymentModule } from './modules/payment/payment.module';
 import { CategoryModule } from './modules/category/category.module';
 import { MovieModule } from './modules/movie/movie.module';
 import { FavouriteModule } from './modules/favourite/favourite.module';
+import { ReviewModule } from './modules/review/review.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { FavouriteModule } from './modules/favourite/favourite.module';
     CategoryModule,
     MovieModule,
     FavouriteModule,
+    ReviewModule,
   ],
 })
 export class AppModule {}
